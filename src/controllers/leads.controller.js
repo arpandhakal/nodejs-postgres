@@ -6,6 +6,9 @@ const leads = db.leads;
 const Op = db.Sequelize.Op;
 const { findLeadsSchema } = require("../utils/validators/find-leads.validator");
 const {
+  findNumberofLeadsSchema,
+} = require("../utils/validators/leads-status-source-number.validator");
+const {
   updateLeadsSchema,
 } = require("../utils/validators/update-leads.validator");
 
@@ -116,6 +119,29 @@ exports.deleteLeads = async (req, res) => {
     const result = await lead.destroy();
 
     res.status(200).json({ message: " lead deleted succesfullt" });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+exports.findNumbers = async (req, res) => {
+  try {
+    const { lead_status, source } = req.query;
+    const query = {};
+    if (lead_status) {
+      query.lead_status = lead_status;
+    }
+    if (source) {
+      query.source = source;
+    }
+    await findNumberofLeadsSchema.validate({
+      lead_status,
+      source,
+    });
+    const totalCount = await leads.count({ where: query });
+    res.status(200).json({
+      count: totalCount,
+    });
   } catch (err) {
     res.status(400).json(err);
   }

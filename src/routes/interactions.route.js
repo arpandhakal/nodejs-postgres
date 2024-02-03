@@ -8,7 +8,7 @@ const {
 const router = express.Router();
 
 router.route("/create/:id").post(create);
-router.route("/findAll/:id").get(findAll);
+router.route("/find-all/:id").get(findAll);
 router.route("/update/:id").patch(update);
 router.route("/delete/:id").delete(deleteInteraction);
 
