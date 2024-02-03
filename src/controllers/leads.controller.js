@@ -1,7 +1,36 @@
 const db = require("../models/index");
+const {
+  createLeadsSchema,
+} = require("../utils/validators/create-leads.validator");
 const leads = db.leads;
 const Op = db.Sequelize.Op;
 const { findLeadsSchema } = require("../utils/validators/find-leads.validator");
+const {
+  updateLeadsSchema,
+} = require("../utils/validators/update-leads.validator");
+
+exports.create = async (req, res) => {
+  try {
+    const { lead_name, email, lead_status, source } = req.body;
+
+    await createLeadsSchema.validate({
+      lead_name,
+      email,
+      lead_status,
+      source,
+    });
+    const result = await leads.create({
+      lead_name,
+      email,
+      lead_status,
+      source,
+    });
+
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
 
 exports.findAll = async (req, res) => {
   try {
@@ -39,6 +68,55 @@ exports.findAll = async (req, res) => {
       data: result,
     });
   } catch (err) {
-    res.status(400).json(err.message);
+    res.status(400).json(err);
+  }
+};
+exports.update = async (req, res) => {
+  try {
+    const { lead_name, email, lead_status, source } = req.body;
+    const { id } = req.params;
+
+    const lead = await leads.findOne({ where: { lead_id: id } });
+    if (!lead) {
+      throw "no lead found with the provided id";
+    }
+
+    await updateLeadsSchema.validate({
+      id,
+      lead_name,
+      email,
+      lead_status,
+      source,
+    });
+    const result = await lead.update(
+      {
+        lead_name,
+        email,
+        lead_status,
+        source,
+      },
+      { returning: true }
+    );
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+exports.deleteLeads = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const lead = await leads.findOne({ where: { lead_id: id } });
+    if (!lead) {
+      throw "no lead found with the provided id";
+    }
+
+    const result = await lead.destroy();
+
+    res.status(200).json({ message: " lead deleted succesfullt" });
+  } catch (err) {
+    res.status(400).json(err);
   }
 };

@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 const port = process.env.APP_PORT || 5656;
 
 db.sequelize
-  .sync()
+  .sync({ force: true })
   .then(() => {
     console.log("Synced db.");
   })

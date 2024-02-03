@@ -10,6 +10,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     email: {
       type: Sequelize.STRING,
+      unique: true,
     },
     lead_status: {
       type: Sequelize.ENUM("New", "Contacted", "Qualified", "Lost"),
